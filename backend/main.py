@@ -23,3 +23,10 @@ def detect(req: Request):
         "class": "laptop",
         "confidence": 0.92
     }
+@app.get("/latest")
+def get_latest():
+    return {
+        "class": "person",
+        "confidence": 0.95,
+        "timestamp": "12:34 PM"
+    }

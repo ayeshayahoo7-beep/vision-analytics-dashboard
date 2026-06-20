@@ -65,3 +65,24 @@ def stats():
             2
         )
     }
+@router.get("/latest")
+def latest():
+
+    db: Session = SessionLocal()
+
+    latest_detection = (
+        db.query(Detection)
+        .order_by(Detection.id.desc())
+        .first()
+    )
+
+    db.close()
+
+    if not latest_detection:
+        return {}
+
+    return {
+        "class": latest_detection.object_name,
+        "confidence": latest_detection.confidence,
+        "timestamp": latest_detection.timestamp
+    }
