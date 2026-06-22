@@ -9,75 +9,90 @@ type Camera = {
 
 export default function Dashboard() {
   const [cameras, setCameras] = useState<Camera[]>([
-    { id: 1, name: "Entrance Cam", detections: 3 },
-    { id: 2, name: "Parking Cam", detections: 7 },
-    { id: 3, name: "Lobby Cam", detections: 2 },
+    { id: 1, name: "Entrance Camera", detections: 24 },
+    { id: 2, name: "Parking Camera", detections: 42 },
+    { id: 3, name: "Lobby Camera", detections: 17 },
   ]);
-
-  const [alerts, setAlerts] = useState(5);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCameras((prev) =>
         prev.map((cam) => ({
           ...cam,
-          detections: Math.max(
-            0,
-            cam.detections + Math.floor(Math.random() * 3 - 1)
-          ),
+          detections: cam.detections + Math.floor(Math.random() * 2),
         }))
       );
-
-      setAlerts((a) =>
-        Math.max(0, a + Math.floor(Math.random() * 3 - 1))
-      );
-    }, 1500);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, []);
 
+  const totalDetections = cameras.reduce(
+    (sum, cam) => sum + cam.detections,
+    0
+  );
+
   return (
     <div style={styles.page}>
       <header style={styles.header}>
-        <h1 style={styles.title}>Vision Analytics Dashboard</h1>
-        <p style={styles.subtitle}>Live AI monitoring system</p>
+        <div>
+          <h1 style={styles.title}>Vision Analytics Dashboard</h1>
+          <p style={styles.subtitle}>
+            Real-Time AI Surveillance & Object Detection
+          </p>
+        </div>
+
+        <div style={styles.status}>
+          <span style={styles.dot}></span>
+          AI Online
+        </div>
       </header>
 
       <div style={styles.statsGrid}>
-        <Detector />
-
         <div style={styles.card}>
-          <h3>Total Cameras</h3>
+          <h3>🎥 Cameras Online</h3>
           <p style={styles.bigNumber}>{cameras.length}</p>
         </div>
 
         <div style={styles.card}>
-          <h3>Active Alerts</h3>
-          <p style={styles.bigNumber}>{alerts}</p>
+          <h3>🚨 Active Alerts</h3>
+          <p style={styles.bigNumber}>5</p>
         </div>
 
         <div style={styles.card}>
-          <h3>Total Detections</h3>
-          <p style={styles.bigNumber}>
-            {cameras.reduce((sum, c) => sum + c.detections, 0)}
-          </p>
+          <h3>📦 Total Detections</h3>
+          <p style={styles.bigNumber}>{totalDetections}</p>
+        </div>
+
+        <div style={styles.card}>
+          <h3>🤖 AI Accuracy</h3>
+          <p style={styles.bigNumber}>94%</p>
         </div>
       </div>
 
-      <h2 style={{ marginTop: 30 }}>Live Camera Feeds</h2>
+      <div style={{ marginTop: "30px" }}>
+        <Detector />
+      </div>
+
+      <h2 style={styles.sectionTitle}>Live Camera Monitoring</h2>
 
       <div style={styles.cameraGrid}>
         {cameras.map((cam) => (
           <div key={cam.id} style={styles.cameraCard}>
             <div style={styles.videoBox}>
-              <div style={styles.overlay}>
-                🎥 LIVE FEED
-              </div>
+              <div style={styles.liveBadge}>LIVE</div>
             </div>
 
             <div style={styles.cameraInfo}>
               <h3>{cam.name}</h3>
-              <p>Detections: {cam.detections}</p>
+
+              <p style={styles.smallText}>
+                🟢 Detection Stream Active
+              </p>
+
+              <p style={styles.smallText}>
+                Detections Today: {cam.detections}
+              </p>
             </div>
           </div>
         ))}
@@ -88,77 +103,113 @@ export default function Dashboard() {
 
 const styles: Record<string, React.CSSProperties> = {
   page: {
-    padding: "30px",
-    fontFamily: "system-ui",
-    background: "linear-gradient(135deg, #0f172a, #1e293b)",
     minHeight: "100vh",
+    background: "linear-gradient(180deg,#020617,#0f172a)",
     color: "white",
+    padding: "40px",
+    fontFamily: "Inter, system-ui, sans-serif",
   },
 
   header: {
-    marginBottom: "20px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "30px",
   },
 
   title: {
-    fontSize: "30px",
     margin: 0,
+    fontSize: "42px",
+    fontWeight: 800,
+    background: "linear-gradient(90deg,#22c55e,#38bdf8)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
   },
 
   subtitle: {
-    opacity: 0.7,
+    color: "#94a3b8",
+    marginTop: "8px",
+  },
+
+  status: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    background: "rgba(34,197,94,0.15)",
+    color: "#22c55e",
+    padding: "10px 16px",
+    borderRadius: "999px",
+    fontWeight: 700,
+  },
+
+  dot: {
+    width: "10px",
+    height: "10px",
+    borderRadius: "50%",
+    background: "#22c55e",
   },
 
   statsGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(4, 1fr)",
-    gap: "15px",
-    marginTop: "20px",
+    gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+    gap: "20px",
   },
 
   card: {
     background: "rgba(255,255,255,0.06)",
-    padding: "15px",
-    borderRadius: "12px",
-    border: "1px solid rgba(255,255,255,0.1)",
+    border: "1px solid rgba(255,255,255,0.08)",
+    borderRadius: "20px",
+    padding: "20px",
+    backdropFilter: "blur(10px)",
   },
 
   bigNumber: {
-    fontSize: "28px",
-    fontWeight: 700,
+    fontSize: "36px",
+    fontWeight: 800,
+    margin: "10px 0 0",
+  },
+
+  sectionTitle: {
+    marginTop: "40px",
+    marginBottom: "20px",
   },
 
   cameraGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
+    gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
     gap: "20px",
-    marginTop: "15px",
   },
 
   cameraCard: {
     background: "rgba(255,255,255,0.05)",
-    borderRadius: "14px",
+    border: "1px solid rgba(255,255,255,0.08)",
+    borderRadius: "20px",
     overflow: "hidden",
-    border: "1px solid rgba(255,255,255,0.1)",
   },
 
   videoBox: {
-    height: "180px",
-    background: "black",
+    height: "220px",
+    background: "linear-gradient(135deg,#111827,#1e293b)",
     position: "relative",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
   },
 
-  overlay: {
+  liveBadge: {
     position: "absolute",
-    color: "#22c55e",
+    top: "12px",
+    right: "12px",
+    background: "#ef4444",
+    color: "white",
+    padding: "6px 12px",
+    borderRadius: "999px",
+    fontSize: "12px",
     fontWeight: 700,
-    fontSize: "14px",
-    letterSpacing: "2px",
   },
 
   cameraInfo: {
-    padding: "10px",
+    padding: "16px",
+  },
+
+  smallText: {
+    color: "#cbd5e1",
   },
 };
