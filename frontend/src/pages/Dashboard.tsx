@@ -1,37 +1,19 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import type { CSSProperties } from "react";
 import Detector from "../components/Detector";
 import LiveCamera from "../components/LiveCamera";
-
 type Camera = {
   id: number;
   name: string;
-  detections: number;
 };
 
 export default function Dashboard() {
-  const [cameras, setCameras] = useState<Camera[]>([
-    { id: 1, name: "Entrance Camera", detections: 24 },
-    { id: 2, name: "Parking Camera", detections: 42 },
-    { id: 3, name: "Lobby Camera", detections: 17 },
+  const [cameras] = useState<Camera[]>([
+    {
+      id: 1,
+      name: "Primary Live Camera",
+    },
   ]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCameras((prev) =>
-        prev.map((cam) => ({
-          ...cam,
-          detections: cam.detections + Math.floor(Math.random() * 2),
-        }))
-      );
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const totalDetections = cameras.reduce(
-    (sum, cam) => sum + cam.detections,
-    0
-  );
 
   return (
     <div style={styles.page}>
@@ -56,58 +38,75 @@ export default function Dashboard() {
 
       <div style={styles.hero}>
         <h2 style={{ marginTop: 0 }}>
-          Intelligent Monitoring Platform
+          Intelligent Vision Analytics Platform
         </h2>
 
         <p style={{ color: "#94a3b8" }}>
-          Real-time video analysis, object detection,
-          surveillance monitoring, and AI-powered insights.
+          Real-time object detection, people counting,
+          surveillance monitoring and AI-powered insights
+          using YOLO26 Nano and FastAPI.
         </p>
+
+        <div style={styles.badges}>
+          <span style={styles.badge}>
+            🎯 YOLO26 Nano
+          </span>
+
+          <span style={styles.badge}>
+            ⚡ FastAPI
+          </span>
+
+          <span style={styles.badge}>
+            📡 Live Detection
+          </span>
+
+          <span style={styles.badge}>
+            👥 People Counting
+          </span>
+        </div>
       </div>
 
       <div style={styles.statsGrid}>
         <div style={styles.card}>
-          <div style={styles.icon}>🎥</div>
-          <h3>Cameras</h3>
-          <p style={styles.bigNumber}>{cameras.length}</p>
-        </div>
-
-        <div style={styles.card}>
-          <div style={styles.icon}>🚨</div>
-          <h3>Alerts</h3>
-          <p style={styles.bigNumber}>5</p>
-        </div>
-
-        <div style={styles.card}>
-          <div style={styles.icon}>📦</div>
-          <h3>Detections</h3>
-          <p style={styles.bigNumber}>{totalDetections}</p>
+          <div style={styles.icon}>📹</div>
+          <h3>Live Cameras</h3>
+          <p style={styles.bigNumber}>1</p>
         </div>
 
         <div style={styles.card}>
           <div style={styles.icon}>🤖</div>
-          <h3>Accuracy</h3>
-          <p style={styles.bigNumber}>94%</p>
+          <h3>AI Model</h3>
+          <p style={styles.bigNumber}>YOLO26</p>
+        </div>
+
+        <div style={styles.card}>
+          <div style={styles.icon}>⚡</div>
+          <h3>Backend</h3>
+          <p style={styles.bigNumber}>ONLINE</p>
+        </div>
+
+        <div style={styles.card}>
+          <div style={styles.icon}>👥</div>
+          <h3>People Count</h3>
+          <p style={styles.bigNumber}>LIVE</p>
         </div>
       </div>
 
-      <div style={{ marginTop: "30px" }}>
+      <div style={styles.mainGrid}>
         <LiveCamera />
-      </div>
-
-      <div style={{ marginTop: "30px" }}>
         <Detector />
       </div>
 
       <div style={styles.timeline}>
         <h3 style={{ marginTop: 0 }}>
-          Recent Detection Activity
+          System Information
         </h3>
 
-        <p>10:41 — Person detected</p>
-        <p>10:42 — Laptop detected</p>
-        <p>10:43 — Mobile phone detected</p>
-        <p>10:44 — Chair detected</p>
+        <p>Model: YOLO26 Nano</p>
+        <p>Frontend: React + TypeScript</p>
+        <p>Backend: FastAPI</p>
+        <p>Inference: Real-Time</p>
+        <p>Status: Operational</p>
       </div>
 
       <h2 style={styles.sectionTitle}>
@@ -116,21 +115,29 @@ export default function Dashboard() {
 
       <div style={styles.cameraGrid}>
         {cameras.map((cam) => (
-          <div key={cam.id} style={styles.cameraCard}>
+          <div
+            key={cam.id}
+            style={styles.cameraCard}
+          >
             <div style={styles.cameraHeader}>
               <span>{cam.name}</span>
 
-              <span style={{ color: "#22c55e" }}>
+              <span
+                style={{
+                  color: "#22c55e",
+                  fontWeight: 700,
+                }}
+              >
                 ● ONLINE
               </span>
             </div>
 
             <div style={styles.cameraBody}>
-              Detection Stream Active
+              🎥 Live Feed Connected
             </div>
 
             <div style={styles.cameraFooter}>
-              Detections Today: {cam.detections}
+              YOLO26 Detection Active
             </div>
           </div>
         ))}
@@ -147,7 +154,7 @@ const styles: Record<string, React.CSSProperties> = {
     background:
       "linear-gradient(180deg,#020617,#0f172a)",
     fontFamily:
-      "Inter, system-ui, -apple-system, sans-serif",
+      "Inter, system-ui, sans-serif",
     position: "relative",
   },
 
@@ -213,11 +220,34 @@ const styles: Record<string, React.CSSProperties> = {
     border: "1px solid rgba(255,255,255,0.08)",
   },
 
+  badges: {
+    display: "flex",
+    gap: "12px",
+    flexWrap: "wrap",
+    marginTop: "20px",
+  },
+
+  badge: {
+    background: "rgba(34,197,94,0.15)",
+    color: "#22c55e",
+    padding: "10px 16px",
+    borderRadius: "999px",
+    fontWeight: 600,
+  },
+
   statsGrid: {
     display: "grid",
     gridTemplateColumns:
       "repeat(auto-fit,minmax(220px,1fr))",
     gap: "20px",
+    marginBottom: "30px",
+  },
+
+  mainGrid: {
+    display: "grid",
+    gridTemplateColumns: "2fr 1fr",
+    gap: "20px",
+    marginBottom: "30px",
   },
 
   card: {
@@ -226,8 +256,6 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "24px",
     border: "1px solid rgba(255,255,255,0.08)",
     backdropFilter: "blur(10px)",
-    boxShadow:
-      "0 10px 30px rgba(0,0,0,0.25)",
   },
 
   icon: {
@@ -235,13 +263,12 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   bigNumber: {
-    fontSize: "38px",
+    fontSize: "34px",
     fontWeight: 800,
     marginBottom: 0,
   },
 
   timeline: {
-    marginTop: "30px",
     background: "rgba(255,255,255,0.05)",
     padding: "24px",
     borderRadius: "20px",
@@ -256,7 +283,7 @@ const styles: Record<string, React.CSSProperties> = {
   cameraGrid: {
     display: "grid",
     gridTemplateColumns:
-      "repeat(auto-fit,minmax(280px,1fr))",
+      "repeat(auto-fit,minmax(300px,1fr))",
     gap: "20px",
   },
 
@@ -281,6 +308,7 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     justifyContent: "center",
     color: "#94a3b8",
+    fontSize: "18px",
   },
 
   cameraFooter: {
@@ -288,4 +316,4 @@ const styles: Record<string, React.CSSProperties> = {
     borderTop:
       "1px solid rgba(255,255,255,0.08)",
   },
-};
+};onabort
