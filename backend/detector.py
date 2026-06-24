@@ -1,34 +1,34 @@
 from ultralytics import YOLO
+import base64
 import cv2
+import numpy as np
 
-# Load YOLO model once
 model = YOLO("yolov8n.pt")
 
-# Open webcam once
-cap = cv2.VideoCapture(0)
+def detect_image(base64_image):
+    image_bytes = base64.b64decode(base64_image)
 
-def detect_from_webcam():
-    success, frame = cap.read()
+    np_array = np.frombuffer(image_bytes, np.uint8)
 
-    if not success:
-        return {
-            "class": "none",
-            "confidence": 0.0
-        }
+    image = cv2.imdecode(np_array, cv2.IMREAD_COLOR)
 
-    results = model(frame)
+    results = model(image)
 
-    for r in results:
-        for box in r.boxes:
-            cls = int(box.cls[0])
+    if len(results) > 0:
+        boxes = results[0].boxes
+
+        if len(boxes) > 0:
+            box = boxes[0]
+
+            cls_id = int(box.cls[0])
             conf = float(box.conf[0])
 
             return {
-                "class": model.names[cls],
-                "confidence": round(conf, 2)
+                "class": model.names[cls_id],
+                "confidence": conf
             }
 
     return {
-        "class": "none",
+        "class": "No object",
         "confidence": 0.0
     }
