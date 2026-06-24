@@ -3,7 +3,7 @@ import base64
 import cv2
 import numpy as np
 
-model = YOLO("yolov8n.pt")
+model = YOLO("yolo26n.pt")
 
 def detect_image(base64_image):
     image_bytes = base64.b64decode(base64_image)
