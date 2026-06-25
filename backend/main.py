@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from detector import detect_from_webcam
 
 app = FastAPI()
 
@@ -18,11 +19,7 @@ class Request(BaseModel):
 @app.post("/detect")
 def detect(req: Request):
 
-    # pretend YOLO result (for now)
-    return {
-        "class": "laptop",
-        "confidence": 0.92
-    }
+    return detect_from_webcam()
 @app.get("/latest")
 def get_latest():
     return {
