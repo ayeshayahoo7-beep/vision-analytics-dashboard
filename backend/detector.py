@@ -79,3 +79,62 @@ def detect_uploaded_file(file_path):
             "detections": [],
             "error": str(e)
         }
+
+
+
+
+def detect_video_file(video_path, model_path="yolov8n.pt"):
+    # Ensure model is initialized within or passed to the function scope
+    model = YOLO(model_path)
+    
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        raise IOError(f"Cannot open video source: {video_path}")
+
+    tracked_objects = {}
+    frame_count = 0
+
+    while cap.isOpened():
+        success, frame = cap.read()
+        if not success:
+            break
+
+        frame_count += 1
+
+        # Analyze every 5th frame
+        if frame_count % 5 != 0:
+            continue
+
+        results = model.track(frame, persist=True, verbose=False)
+
+        for result in results:
+            if result.boxes is None:
+                continue
+
+            for box in result.boxes:
+                # Ensure the box actually has a tracking ID assigned
+                if box.id is not None:
+                    cls_id = int(box.cls.item())
+                    label = model.names[cls_id]
+                    track_id = int(box.id.item())
+
+                    if label not in tracked_objects:
+                        tracked_objects[label] = set()
+                    
+                    tracked_objects[label].add(track_id)
+
+    cap.release()
+
+    # Calculate final unique counts per object class
+    final_detections = {
+        label: len(ids) for label, ids in tracked_objects.items()
+    }
+    
+    # Extract unique person count directly from the tracked objects dictionary
+    unique_people_count = len(tracked_objects.get("person", set()))
+
+    return {
+        "people_count": unique_people_count,
+        "unique_people": unique_people_count,
+        "detections": final_detections
+    }

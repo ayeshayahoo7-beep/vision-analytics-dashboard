@@ -2,11 +2,15 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+
 import os
 import tempfile
 
-from detector import detect_image, detect_uploaded_file
-
+from detector import (
+    detect_image,
+    detect_uploaded_file,
+    detect_video_file,
+)
 app = FastAPI()
 
 app.add_middleware(
@@ -69,6 +73,43 @@ async def detect_uploaded_image(file: UploadFile = File(...)):
         if temp_path and os.path.exists(temp_path):
             os.remove(temp_path)
 
+@app.post("/detect-video")
+async def detect_video(
+    file: UploadFile = File(...)
+):
+    temp_path = None
+
+    try:
+        suffix = os.path.splitext(
+            file.filename
+        )[1]
+
+        with tempfile.NamedTemporaryFile(
+            delete=False,
+            suffix=suffix
+        ) as temp_file:
+
+            temp_file.write(
+                await file.read()
+            )
+
+            temp_path = temp_file.name
+
+        return detect_video_file(
+            temp_path
+        )
+
+    except Exception as e:
+        return {
+            "error": str(e)
+        }
+
+    finally:
+        if (
+            temp_path
+            and os.path.exists(temp_path)
+        ):
+            os.remove(temp_path)
 @app.get("/latest")
 def latest():
     return latest_result

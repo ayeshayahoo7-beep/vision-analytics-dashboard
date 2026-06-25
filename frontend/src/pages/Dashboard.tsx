@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import Detector from "../components/Detector";
 import LiveCamera from "../components/LiveCamera";
 import ImageUploader from "../components/ImageUploader";
+import VideoUploader from "../components/VideoUploader";
 
 export default function Dashboard() {
   return ( 
@@ -78,6 +79,10 @@ export default function Dashboard() {
 
       <div style={{ marginTop: "25px" }}>
         <ImageUploader />
+      </div>
+   
+      <div style={{ marginTop: "25px" }}>
+        <VideoUploader />
       </div>
 
       <div style={styles.infoCard}>
