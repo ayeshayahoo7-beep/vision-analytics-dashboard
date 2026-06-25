@@ -6,139 +6,126 @@ type Detection = {
 };
 
 type DetectionResponse = {
-  latest_detection: string;
-  confidence: number;
-  people_count: number;
   detections: Detection[];
+  people_count: number;
+  confidence: number;
 };
 
 export default function Detector() {
-  const [online, setOnline] = useState(false);
-
-  const [data, setData] =
+  const [result, setResult] =
     useState<DetectionResponse>({
-      latest_detection: "Waiting...",
-      confidence: 0,
-      people_count: 0,
       detections: [],
+      people_count: 0,
+      confidence: 0,
     });
 
+  const [online, setOnline] =
+    useState(false);
+
   useEffect(() => {
-    const fetchLatest = async () => {
+    const fetchData = async () => {
       try {
         const response = await fetch(
           "http://localhost:8000/latest"
         );
 
-        const result = await response.json();
+        const data = await response.json();
 
-        setData(result);
-
+        setResult(data);
         setOnline(true);
-      } catch (error) {
-        console.error(
-          "Backend offline:",
-          error
-        );
-
+      } catch {
         setOnline(false);
       }
     };
 
-    fetchLatest();
+    fetchData();
 
     const interval = setInterval(
-      fetchLatest,
-      1000
+      fetchData,
+      2000
     );
 
-    return () =>
-      clearInterval(interval);
+    return () => clearInterval(interval);
   }, []);
 
   return (
     <div
       style={{
         background:
-          "rgba(255,255,255,0.06)",
-        padding: "20px",
-        borderRadius: "16px",
+          "rgba(255,255,255,0.05)",
+        padding: "24px",
+        borderRadius: "20px",
         border:
-          "1px solid rgba(255,255,255,0.1)",
+          "1px solid rgba(255,255,255,0.08)",
+        color: "white",
       }}
     >
-      <h2
-        style={{
-          marginTop: 0,
-          marginBottom: "15px",
-        }}
-      >
-        🤖 AI Detection Status
-      </h2>
+      <h2>🤖 AI Detection Panel</h2>
 
       <p>
         {online
-          ? "🟢 Model Online"
+          ? "🟢 Backend Online"
           : "🔴 Backend Offline"}
       </p>
 
-      <h3>
-        Latest Detection:
-        {" "}
-        {data.latest_detection}
-      </h3>
-
-      <p>
-        <strong>Confidence:</strong>{" "}
-        {(
-          data.confidence * 100
-        ).toFixed(1)}
-        %
-      </p>
-
-      <h2
+      <div
         style={{
-          color: "#22c55e",
+          background:
+            "rgba(34,197,94,0.12)",
+          padding: "12px",
+          borderRadius: "12px",
+          marginBottom: "15px",
         }}
       >
-        👥 People Detected:
-        {" "}
-        {data.people_count}
-      </h2>
+        <strong>
+          👥 People Detected:
+        </strong>{" "}
+        {result.people_count}
+      </div>
 
-      <hr
+      <div
         style={{
-          borderColor:
-            "rgba(255,255,255,0.1)",
+          background:
+            "rgba(59,130,246,0.12)",
+          padding: "12px",
+          borderRadius: "12px",
+          marginBottom: "20px",
         }}
-      />
+      >
+        <strong>
+          🎯 Highest Confidence:
+        </strong>{" "}
+        {(result.confidence * 100).toFixed(
+          1
+        )}
+        %
+      </div>
 
       <h3>Detected Objects</h3>
 
-      {data.detections.length === 0 ? (
-        <p>No objects detected</p>
+      {result.detections.length === 0 ? (
+        <p>No detections yet</p>
       ) : (
-        data.detections.map(
+        result.detections.map(
           (item, index) => (
             <div
               key={index}
               style={{
-                display: "flex",
-                justifyContent:
-                  "space-between",
-                padding: "6px 0",
+                background:
+                  "rgba(255,255,255,0.05)",
+                padding: "10px",
+                borderRadius: "10px",
+                marginBottom: "10px",
               }}
             >
-              <span>
+              <strong>
                 {item.class}
-              </span>
-
-              <span>
-                {(
-                  item.confidence * 100
-                ).toFixed(1)}
-                %
-              </span>
+              </strong>{" "}
+              —{" "}
+              {(
+                item.confidence * 100
+              ).toFixed(1)}
+              %
             </div>
           )
         )
