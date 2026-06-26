@@ -3,6 +3,7 @@ import Detector from "../components/Detector";
 import LiveCamera from "../components/LiveCamera";
 import ImageUploader from "../components/ImageUploader";
 import VideoUploader from "../components/VideoUploader";
+import LiveDetection from "../components/LiveDetection";
 
 export default function Dashboard() {
   return ( 
@@ -84,6 +85,8 @@ export default function Dashboard() {
       <div style={{ marginTop: "25px" }}>
         <VideoUploader />
       </div>
+      
+      <LiveDetection />
 
       <div style={styles.infoCard}>
         <h3>System Information</h3>
