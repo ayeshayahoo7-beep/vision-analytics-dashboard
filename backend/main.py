@@ -15,8 +15,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
+import detector
 from detector import (
-    model,
     detect_image,
     detect_uploaded_file,
     detect_video_file,
@@ -43,6 +43,8 @@ class DetectionRequest(BaseModel):
     image: str
 
 
+active_model_name = "yolo26n"
+
 latest_result = {
     "class": "Waiting...",
     "confidence": 0.0,
@@ -63,11 +65,42 @@ def generate_frames():
             if not success:
                 break
 
-            results = model.track(
+            results = detector.model.track(
                 frame,
                 persist=True,
                 verbose=False,
             )
+
+            # Update latest_result with actual tracking telemetry
+            detections = []
+            people_count = 0
+            highest_confidence = 0.0
+
+            if len(results) > 0 and results[0].boxes is not None:
+                for box in results[0].boxes:
+                    cls_id = int(box.cls.item())
+                    confidence = float(box.conf.item())
+                    label = detector.model.names[cls_id]
+                    x1, y1, x2, y2 = box.xyxy[0].tolist()
+
+                    detections.append({
+                        "class": label,
+                        "confidence": round(confidence, 3),
+                        "box": [int(x1), int(y1), int(x2), int(y2)]
+                    })
+
+                    if label == "person":
+                        people_count += 1
+
+                    highest_confidence = max(highest_confidence, confidence)
+
+            global latest_result
+            latest_result = {
+                "class": detections[0]["class"] if detections else "None",
+                "confidence": round(highest_confidence, 3),
+                "people_count": people_count,
+                "detections": detections,
+            }
 
             annotated = results[0].plot()
 
@@ -95,8 +128,24 @@ def video_feed():
 def home():
     return {
         "status": "online",
-        "model": "YOLO26 Nano"
+        "model": "YOLO26 Nano" if active_model_name == "yolo26n" else "YOLOv8 Nano"
     }
+
+
+@app.post("/set-model")
+def set_model(model_name: str):
+    global active_model_name
+    if model_name not in ["yolo26n", "yolov8n"]:
+        raise HTTPException(status_code=400, detail="Invalid model name. Choose yolo26n or yolov8n.")
+    
+    from ultralytics import YOLO
+    try:
+        new_model = YOLO(f"{model_name}.pt")
+        detector.model = new_model
+        active_model_name = model_name
+        return {"status": "success", "model": model_name}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/detect")
@@ -223,12 +272,14 @@ async def websocket_video(
 
 @app.get("/latest")
 def latest():
-    return latest_result
+    res = latest_result.copy()
+    res["active_model"] = "YOLO26 Nano" if active_model_name == "yolo26n" else "YOLOv8 Nano"
+    return res
 
 
 @app.get("/health")
 def health():
     return {
         "status": "healthy",
-        "model": "YOLO26 Nano"
+        "model": "YOLO26 Nano" if active_model_name == "yolo26n" else "YOLOv8 Nano"
     }

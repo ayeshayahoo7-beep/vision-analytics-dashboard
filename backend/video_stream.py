@@ -1,6 +1,6 @@
 import cv2
 import base64
-from detector import model
+import detector
 
 
 def stream_video(video_path):
@@ -16,7 +16,7 @@ def stream_video(video_path):
             break
 
         # Run YOLO tracking
-        results = model.track(
+        results = detector.model.track(
             frame,
             persist=True,
             verbose=False
@@ -36,7 +36,7 @@ def stream_video(video_path):
         for box in results[0].boxes:
 
             cls = int(box.cls.item())
-            label = model.names[cls]
+            label = detector.model.names[cls]
 
             detections[label] = (
                 detections.get(label, 0) + 1

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import UploadZone from "./ui/UploadZone";
-import DetectionCard from "./dashboard/DetectionCard";
+import UploadZone from "../ui/UploadZone";
+import DetectionCard from "../dashboard/DetectionCard";
 
 const icons: Record<string,string> = {
   person:"👤",
