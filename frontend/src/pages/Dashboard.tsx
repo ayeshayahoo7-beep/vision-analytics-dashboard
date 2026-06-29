@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import { useEffect, useState } from "react";
 import Detector from "../components/Detector";
 
@@ -13,6 +14,23 @@ export default function Dashboard() {
     { id: 2, name: "Parking Cam", detections: 7 },
     { id: 3, name: "Lobby Cam", detections: 2 },
   ]);
+
+import { useState } from "react";
+import type { CSSProperties } from "react";
+
+import Detector from "../components/Detector";
+import LiveCamera from "../components/LiveCamera";
+import ImageUploader from "../components/ImageUploader";
+import VideoUploader from "../components/VideoUploader";
+import LiveVideoDetection from "../components/LiveVideoDetection";
+
+export default function Dashboard() {
+  const [videoId, setVideoId] = useState<string | null>(null);
+
+  return (
+    <div style={styles.page}>
+      <div style={styles.glow}></div>
+
 
   const [alerts, setAlerts] = useState(5);
 
@@ -43,6 +61,29 @@ export default function Dashboard() {
         <p style={styles.subtitle}>Live AI monitoring system</p>
       </header>
 
+
+      <div style={styles.hero}>
+        <h2 style={{ marginTop: 0 }}>
+          Intelligent Vision Analytics Platform
+        </h2>
+
+        <p style={{ color: "#94a3b8" }}>
+          Real-time object detection, people counting,
+          image analysis and AI-powered surveillance
+          monitoring using YOLO26 Nano and FastAPI.
+        </p>
+
+        <div style={styles.badges}>
+          <span style={styles.badge}>🎯 YOLO26 Nano</span>
+          <span style={styles.badge}>⚡ FastAPI</span>
+          <span style={styles.badge}>📡 Live Detection</span>
+          <span style={styles.badge}>👥 People Counting</span>
+          <span style={styles.badge}>🖼 Image Upload</span>
+          <span style={styles.badge}>🎥 Video Analytics</span>
+        </div>
+      </div>
+
+
       <div style={styles.statsGrid}>
         <Detector />
 
@@ -64,7 +105,21 @@ export default function Dashboard() {
         </div>
       </div>
 
+
       <h2 style={{ marginTop: 30 }}>Live Camera Feeds</h2>
+
+      <div style={{ marginTop: "25px" }}>
+        <ImageUploader />
+      </div>
+
+      <div style={{ marginTop: "25px" }}>
+        <VideoUploader onUpload={setVideoId} />
+      </div>
+
+      <div style={{ marginTop: "25px" }}>
+        <LiveVideoDetection videoId={videoId} />
+      </div>
+
 
       <div style={styles.cameraGrid}>
         {cameras.map((cam) => (
@@ -75,12 +130,21 @@ export default function Dashboard() {
               </div>
             </div>
 
+
             <div style={styles.cameraInfo}>
               <h3>{cam.name}</h3>
               <p>Detections: {cam.detections}</p>
             </div>
           </div>
         ))}
+=======
+        <p>🎯 Model: YOLO26 Nano</p>
+        <p>⚛️ Frontend: React + TypeScript</p>
+        <p>🚀 Backend: FastAPI</p>
+        <p>📡 Inference: Real-Time Detection</p>
+        <p>🖼 Upload Support: Images & Videos</p>
+        <p>👥 Multi-Person Counting Enabled</p>
+
       </div>
     </div>
   );
@@ -93,6 +157,22 @@ const styles: Record<string, React.CSSProperties> = {
     background: "linear-gradient(135deg, #0f172a, #1e293b)",
     minHeight: "100vh",
     color: "white",
+
+    fontFamily: "Inter, system-ui, sans-serif",
+    position: "relative",
+    overflowX: "hidden",
+  },
+
+  glow: {
+    position: "absolute",
+    top: "-150px",
+    right: "-150px",
+    width: "400px",
+    height: "400px",
+    borderRadius: "50%",
+    background: "radial-gradient(circle,#22c55e22,transparent)",
+    pointerEvents: "none",
+
   },
 
   header: {
@@ -140,6 +220,7 @@ const styles: Record<string, React.CSSProperties> = {
     overflow: "hidden",
     border: "1px solid rgba(255,255,255,0.1)",
   },
+
 
   videoBox: {
     height: "180px",
